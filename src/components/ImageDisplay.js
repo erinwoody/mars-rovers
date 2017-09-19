@@ -1,11 +1,21 @@
-import React, { Component } from 'react'
+import React from "react";
 
-export default class ImageDisplay extends Component {
-  render() {
+const imageDisplay = ({ images }) => {
+
+  let imagesArray = images.map((image, index) => {
     return (
-      <div>
-        
+      <div key={index}>
+        <img src={image["img_src"]} />
       </div>
     )
-  }
+  })
+ 
+  return (
+    <div>
+      {imagesArray}
+    </div>
+  )
+
 }
+
+export default imageDisplay;

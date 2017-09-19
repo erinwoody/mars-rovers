@@ -3,36 +3,47 @@ import GetImageButton from "./GetImageButton";
 import ImageDisplay from "./ImageDisplay";
 import axios from "axios";
 
-const API_KEY = "jcx1fZYmsLcNALvq28kg6AY451n1rMHJHzhMBZaL";
-const URL_QUERY = "?api_key";
-const NASA_URL = "https://api.nasa.gov/planetary/apod";
+const NASA_URL =
+  "https://api.nasa.gov/planetary/apod?api_key=jcx1fZYmsLcNALvq28kg6AY451n1rMHJHzhMBZaL";
 
 export default class GetImageForm extends Component {
-    constructor(props) {
-        super(props);
-        this.state = { value: 'Curiosity' };
-
-        this.handleSol = this.handleSol.bind(this);
-        this.handleRover = this.handleRover.bind(this);
-        this.handleCamera = this.handleCamera.bind(this);
-    }
-  handleSol(e) {
-    this.setState({ value: e.target.value});
+  constructor(props) {
+    super(props);
+    this.state = {
+      rover: "Curiosity",
+      camera: "FHAZ",
+      images: [],
+      sol: ""
+    };
   }
 
-  handleRover(e) {
-      this.setState({ value: e.target.value});
+  handleRover = e => {
+    this.setState({ rover: e.target.value });
+  };
+
+  handleCamera = e => {
+    this.setState({ camera: e.target.value });
+  };
+  handleSol = e => {
+    this.setState({ sol: e.target.value });
+  };
+
+  handleSubmit = e => {
+    let { cam, rove } = this.state;
+    let num = this.state.sol;  
+    const API_KEY = "jcx1fZYmsLcNALvq28kg6AY451n1rMHJHzhMBZaL";
+
+    let imageUrl = `https://api.nasa.gov/mars-photos/api/v1/rovers/${rove}/photos?sol=${num}&camera=${cam}&api_key=${API_KEY}`;
+    axios.get(imageUrl).then(response => {
+      this.setState({images: response.data.photos});
+    })
   }
-  
-  handleCamera(e) {
-      this.setState({ value: e.target.value });
-  }
-    
+   
   render() {
     return (
-      <div>
+      <div className="image-form">
         <label htmlFor="rover">Rover</label>
-        <select onChange={this.handleRover} id="rover" value={this.state.value}>
+        <select onChange={this.handleRover} id="rover" value={this.state.rove}>
           <option value="Curiosity">Curiosity</option>
           <option value="Opportunity">Opportunity</option>
           <option value="Spirit">Spirt</option>
@@ -41,7 +52,7 @@ export default class GetImageForm extends Component {
         <select
           onChange={this.handleCamera}
           id="rover"
-          value={this.state.value}
+          value={this.state.cam}
         >
           <option value="fhaz">FHAZ (Front Hazard)</option>
           <option value="rhaz">RHAZ (Rear Hazard)</option>
@@ -53,11 +64,11 @@ export default class GetImageForm extends Component {
           onChange={this.handleSol}
           max="2000"
           min="1000"
-          value={this.state.value}
+          value={this.state.num}
         />
 
-        <GetImageButton />
-        <ImageDisplay />
+        <GetImageButton handleClick={this.handleSubmit} />
+        <ImageDisplay images={this.state.images} />    
       </div>
     );
   }
